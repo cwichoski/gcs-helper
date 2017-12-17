@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -49,6 +50,12 @@ func getMapHandler(c Config, client *storage.Client) http.HandlerFunc {
 			return
 		}
 		m = appendExtraResources(r, c, m)
+		m, err = signedURLs(c, m)
+		if err != nil {
+			logger.WithError(err).Error("failed to sign URLs")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(m)
 	}
@@ -118,4 +125,43 @@ func expandPrefix(prefix string, config Config, bucketHandle *storage.BucketHand
 		}
 	}
 	return nil, err
+}
+
+func signedURLs(config Config, m mapping) (mapping, error) {
+	opts, err := config.SignConfig.Options()
+	if err != nil || opts == nil {
+		return m, err
+	}
+	seqs := m.Sequences
+	for s, seq := range seqs {
+		for c, clip := range seq.Clips {
+			path, err := signedPath(clip.Path, opts)
+			if err != nil {
+				return m, err
+			}
+			clip.Path = path
+			seq.Clips[c] = clip
+		}
+		seqs[s] = seq
+	}
+	m.Sequences = seqs
+	return m, nil
+}
+
+func signedPath(path string, opts *storage.SignedURLOptions) (string, error) {
+	parts := strings.SplitN(path, "/", 3)
+	if len(parts) != 3 {
+		return path, nil
+	}
+	bucketName := parts[1]
+	objectKey := parts[2]
+	rawSignedURL, err := storage.SignedURL(bucketName, objectKey, opts)
+	if err != nil {
+		return "", err
+	}
+	signedURL, err := url.Parse(rawSignedURL)
+	if err != nil {
+		return "", err
+	}
+	return signedURL.RequestURI(), nil
 }
