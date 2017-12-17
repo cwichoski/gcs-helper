@@ -13,6 +13,8 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+const maxTry = 5
+
 type mapping struct {
 	Sequences []sequence `json:"sequences"`
 }

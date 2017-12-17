@@ -11,37 +11,29 @@ import (
 
 func TestLoadConfig(t *testing.T) {
 	setEnvs(map[string]string{
-		"GCS_HELPER_LISTEN":               "0.0.0.0:3030",
-		"GCS_HELPER_BUCKET_NAME":          "some-bucket",
-		"GCS_HELPER_LOG_LEVEL":            "info",
-		"GCS_HELPER_MAP_PREFIX":           "/map/",
-		"GCS_HELPER_PROXY_PREFIX":         "/proxy/",
-		"GCS_HELPER_PROXY_LOG_HEADERS":    "Accept,Range",
-		"GCS_HELPER_PROXY_TIMEOUT":        "20s",
-		"GCS_HELPER_PROXY_BUCKET_ON_PATH": "true",
-		"GCS_HELPER_MAP_REGEX_FILTER":     `(240|360|424|480|720|1080)p(\.mp4|[a-z0-9_-]{37}\.(vtt|srt))$`,
-		"GCS_HELPER_MAP_REGEX_HD_FILTER":  `((720|1080)p\.mp4)|(\.(vtt|srt))$`,
-		"GCS_HELPER_MAP_EXTRA_PREFIXES":   "subtitles/,mp4s/",
-		"GCS_CLIENT_TIMEOUT":              "60s",
-		"GCS_CLIENT_IDLE_CONN_TIMEOUT":    "3m",
-		"GCS_CLIENT_MAX_IDLE_CONNS":       "16",
+		"GCS_HELPER_LISTEN":              "0.0.0.0:3030",
+		"GCS_HELPER_BUCKET_NAME":         "some-bucket",
+		"GCS_HELPER_LOG_LEVEL":           "info",
+		"GCS_HELPER_MAP_PREFIX":          "/map/",
+		"GCS_HELPER_MAP_REGEX_FILTER":    `(240|360|424|480|720|1080)p(\.mp4|[a-z0-9_-]{37}\.(vtt|srt))$`,
+		"GCS_HELPER_MAP_REGEX_HD_FILTER": `((720|1080)p\.mp4)|(\.(vtt|srt))$`,
+		"GCS_HELPER_MAP_EXTRA_PREFIXES":  "subtitles/,mp4s/",
+		"GCS_CLIENT_TIMEOUT":             "60s",
+		"GCS_CLIENT_IDLE_CONN_TIMEOUT":   "3m",
+		"GCS_CLIENT_MAX_IDLE_CONNS":      "16",
 	})
 	config, err := loadConfig()
 	if err != nil {
 		t.Fatal(err)
 	}
 	expectedConfig := Config{
-		BucketName:        "some-bucket",
-		Listen:            "0.0.0.0:3030",
-		LogLevel:          "info",
-		MapPrefix:         "/map/",
-		ProxyPrefix:       "/proxy/",
-		MapExtraPrefixes:  []string{"subtitles/", "mp4s/"},
-		MapRegexFilter:    `(240|360|424|480|720|1080)p(\.mp4|[a-z0-9_-]{37}\.(vtt|srt))$`,
-		MapRegexHDFilter:  `((720|1080)p\.mp4)|(\.(vtt|srt))$`,
-		ProxyLogHeaders:   []string{"Accept", "Range"},
-		ProxyTimeout:      20 * time.Second,
-		ProxyBucketOnPath: true,
+		BucketName:       "some-bucket",
+		Listen:           "0.0.0.0:3030",
+		LogLevel:         "info",
+		MapPrefix:        "/map/",
+		MapExtraPrefixes: []string{"subtitles/", "mp4s/"},
+		MapRegexFilter:   `(240|360|424|480|720|1080)p(\.mp4|[a-z0-9_-]{37}\.(vtt|srt))$`,
+		MapRegexHDFilter: `((720|1080)p\.mp4)|(\.(vtt|srt))$`,
 		ClientConfig: ClientConfig{
 			IdleConnTimeout: 3 * time.Minute,
 			MaxIdleConns:    16,
@@ -60,10 +52,9 @@ func TestLoadConfigDefaultValues(t *testing.T) {
 		t.Fatal(err)
 	}
 	expectedConfig := Config{
-		BucketName:   "some-bucket",
-		Listen:       ":8080",
-		LogLevel:     "debug",
-		ProxyTimeout: 10 * time.Second,
+		BucketName: "some-bucket",
+		Listen:     ":8080",
+		LogLevel:   "debug",
 		ClientConfig: ClientConfig{
 			IdleConnTimeout: 120 * time.Second,
 			MaxIdleConns:    10,

@@ -7,20 +7,17 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/fsouza/fake-gcs-server/fakestorage"
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestServerMultiPrefixes(t *testing.T) {
+func TestServer(t *testing.T) {
 	addr, cleanup := startServer(t, Config{
 		BucketName:          "my-bucket",
 		MapPrefix:           "/map/",
 		MapExtraPrefixes:    []string{"subs/", "mp4s/"},
 		ExtraResourcesToken: "extra",
-		ProxyPrefix:         "/proxy/",
-		ProxyTimeout:        time.Second,
 		MapRegexFilter:      `(240|360|424|480|720|1080)p(\.mp4|[a-z0-9_-]{37}\.(vtt|srt))$`,
 		MapRegexHDFilter:    `((720|1080)p\.mp4)|(\.(vtt|srt))$`,
 	})
@@ -38,32 +35,6 @@ func TestServerMultiPrefixes(t *testing.T) {
 			addr:           addr + "/what",
 			expectedStatus: http.StatusNotFound,
 			expectedBody:   "not found\n",
-		},
-		{
-			testCase:       "proxy: download file",
-			method:         http.MethodGet,
-			addr:           addr + "/proxy/musics/music/music1.txt",
-			expectedStatus: http.StatusOK,
-			expectedHeader: http.Header{
-				"Accept-Ranges":  []string{"bytes"},
-				"Content-Length": []string{"15"},
-			},
-			expectedBody: "some nice music",
-		},
-		{
-			testCase: "proxy: download file - range",
-			method:   http.MethodGet,
-			addr:     addr + "/proxy/musics/music/music2.txt",
-			reqHeader: http.Header{
-				"Range": []string{"bytes=2-10"},
-			},
-			expectedStatus: http.StatusPartialContent,
-			expectedHeader: http.Header{
-				"Accept-Ranges":  []string{"bytes"},
-				"Content-Length": []string{"8"},
-				"Content-Range":  []string{"bytes 2-10/16"},
-			},
-			expectedBody: "me nicer",
 		},
 		{
 			testCase:       "map: list of files",

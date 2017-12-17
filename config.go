@@ -11,18 +11,14 @@ import (
 // Config represents the gcs-helper configuration that is loaded from the
 // environment.
 type Config struct {
-	Listen              string        `default:":8080"`
-	BucketName          string        `envconfig:"BUCKET_NAME" required:"true"`
-	LogLevel            string        `envconfig:"LOG_LEVEL" default:"debug"`
-	ProxyLogHeaders     []string      `envconfig:"PROXY_LOG_HEADERS"`
-	ProxyPrefix         string        `envconfig:"PROXY_PREFIX"`
-	ProxyTimeout        time.Duration `envconfig:"PROXY_TIMEOUT" default:"10s"`
-	ProxyBucketOnPath   bool          `envconfig:"PROXY_BUCKET_ON_PATH"`
-	MapPrefix           string        `envconfig:"MAP_PREFIX"`
-	ExtraResourcesToken string        `envconfig:"EXTRA_RESOURCES_TOKEN"`
-	MapRegexFilter      string        `envconfig:"MAP_REGEX_FILTER"`
-	MapRegexHDFilter    string        `envconfig:"MAP_REGEX_HD_FILTER"`
-	MapExtraPrefixes    []string      `envconfig:"MAP_EXTRA_PREFIXES"`
+	Listen              string   `default:":8080"`
+	BucketName          string   `envconfig:"BUCKET_NAME" required:"true"`
+	LogLevel            string   `envconfig:"LOG_LEVEL" default:"debug"`
+	MapPrefix           string   `envconfig:"MAP_PREFIX"`
+	ExtraResourcesToken string   `envconfig:"EXTRA_RESOURCES_TOKEN"`
+	MapRegexFilter      string   `envconfig:"MAP_REGEX_FILTER"`
+	MapRegexHDFilter    string   `envconfig:"MAP_REGEX_HD_FILTER"`
+	MapExtraPrefixes    []string `envconfig:"MAP_EXTRA_PREFIXES"`
 	ClientConfig        ClientConfig
 }
 
